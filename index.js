@@ -30,6 +30,8 @@ function getFinals(data) {
     return data.filter(item => item.Stage == "Final");
 };
 
+console.log(getFinals(fifaData));
+
 /* Task 3: Implement a higher-order function called `getYears` that accepts the callback function `getFinals`, and returns an array called `years` containing all of the years in the dataset */
 
 function getYears(getFinals) {
@@ -84,13 +86,20 @@ console.log(getWinnersByYearBetter(getFinals));
 
 /* Task 7: Write a function called `getAverageGoals` that accepts a parameter `data` and returns the the average number of home team goals and away team goals scored per match (Hint: use .reduce and do this in 2 steps) */
 
-function getAverageGoals(/* code here */) {
+function sumByProperty(data, prop){
+    return data.reduce((sum, item) => sum + item[prop], 0);
+}
 
-    /* code here */
+function avgByProperty(data, prop){
+    return sumByProperty(data, prop) / data.length;
+}
 
+function getAverageGoals(data) {
+    return {home: avgByProperty(data, "Home Team Goals"), away: avgByProperty(data, "Away Team Goals")};
 };
 
-getAverageGoals();
+let avgGoals = getAverageGoals(getFinals(fifaData));
+console.log(`Average goals: home ${avgGoals.home}, away ${avgGoals.away}`);
 
 /// STRETCH 🥅 //
 
