@@ -108,14 +108,47 @@ console.log(`Average goals: home ${avgGoals.home}, away ${avgGoals.away}`);
 Hint: Investigate your data to find "team initials"!
 Hint: use `.reduce` */
 
-function getCountryWins(/* code here */) {
+function isWinnerOf(match, name) {
+    if(name === match["Home Team Initials"] || name === match["Home Team Name"])
+    { // if we're the home team...
+        if(match["Home Team Goals"] > match["Away Team Goals"])
+        {
+            return true;
+        }
+        else if(match["Home Team Goals"] === match["Away Team Goals"])
+        {
+            return match["Win conditions"].split(" ")[0] === match["Home Team Name"]; // not a perfect match; some full names don't get fully named in win conditions, like "Germany FR"
+        }
+    }
+    else if(name === match["Away Team Initials"] || name === match["Away Team Name"])
+    { // if we're the away team...
+        if(match["Away Team Goals"] > match["Home Team Goals"])
+        {
+            return true;
+        }
+        else if(match["Away Team Goals"] === match["Home Team Goals"])
+        {
+            return match["Win conditions"].split(" ")[0] === match["Away Team Name"];
+        }
+    } // if we're neither team, we obviously weren't the winner
+    return false;
+}
 
-    /* code here */
-
+function getCountryWins(data, team) {
+    return data.reduce((wins, match) => {
+        if(isWinnerOf(match, team)) {wins += 1;}
+        return wins;
+    }, 0);
+    // I wasn't sure whether to read "the number of world cup wins XYZ has had" as "the number of times XYZ won a match" or "the number of times XYZ won the World Cup"
+    // but I decided to implement the first, since the second is just a matter of calling the first on a smaller data set
 };
 
-getCountryWins();
+console.log(`Italy has won ${getCountryWins(fifaData, "ITA")} matches at the World Cup.`);
+console.log(`Italy has won ${getCountryWins(getFinals(fifaData), "ITA")} World Cups.`);
 
+// works on whole names, too
+console.log(`Italy has won ${getCountryWins(fifaData, "Italy")} matches at the World Cup.`);
+console.log(`Italy has won ${getCountryWins(getFinals(fifaData), "Italy")} World Cups.`);
 
 /* Stretch 3: Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
