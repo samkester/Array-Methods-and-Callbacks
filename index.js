@@ -68,11 +68,19 @@ Parameters:
  * callback function getYears
  */
 
-function getWinnersByYear(/* code here */) {
-
+function getWinnersByYear(getYears, getWinners, getFinals) {
+    // this isn't possible without passing in the getFinals, since neither of the other functions actually defines it
+    const winners = getWinners(getFinals);
+    return getYears(getFinals).map((item, index) => `In ${item}, ${winners[index]} won the World Cup.`);
 };
 
-getWinnersByYear();
+function getWinnersByYearBetter(getFinals) {
+    // the easier route is just to use a single template literal
+    return getFinals(fifaData).map(item => `In ${item.Year}, ${winnerOf(item)} won the World Cup.`);
+};
+
+console.log(getWinnersByYear(getYears, getWinners, getFinals));
+console.log(getWinnersByYearBetter(getFinals));
 
 /* Task 7: Write a function called `getAverageGoals` that accepts a parameter `data` and returns the the average number of home team goals and away team goals scored per match (Hint: use .reduce and do this in 2 steps) */
 
