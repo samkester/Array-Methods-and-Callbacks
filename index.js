@@ -136,7 +136,7 @@ function isWinnerOf(match, name) {
 
 function getCountryWins(data, team) {
     return data.reduce((wins, match) => {
-        if(isWinnerOf(match, team)) {wins += 1;}
+        if(isWinnerOf(match, team)) {wins += 1;} // the isWinnerOf logic could be written here, but I think separating it makes it more readable, and it's reuseable in case we need to check the winner of a match in another context
         return wins;
     }, 0);
     // I wasn't sure whether to read "the number of world cup wins XYZ has had" as "the number of times XYZ won a match" or "the number of times XYZ won the World Cup"
@@ -152,23 +152,108 @@ console.log(`Italy has won ${getCountryWins(getFinals(fifaData), "Italy")} World
 
 /* Stretch 3: Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
-function getGoals(/* code here */) {
+function getGoals(data) {
+    const goals = {}; // new object, which will be a dictionary - a linking of keys (team names) to values (aggregate goals)
+    const appearances = {}; // as above but for team names -> appearances
 
-    /* code here */
+    data.forEach(item => {
+        if(goals[item["Home Team Name"]] == undefined)
+        {
+            goals[item["Home Team Name"]] = 0; // add entries if there isn't one for this team yet
+            appearances[item["Home Team Name"]] = 0;
+        }
 
+        goals[item["Home Team Name"]] += item["Home Team Goals"];
+        appearances[item["Home Team Name"]] ++;
+        
+        // repeat for away team
+        if(goals[item["Away Team Name"]] == undefined)
+        {
+            goals[item["Away Team Name"]] = 0;
+            appearances[item["Away Team Name"]] = 0;
+        }
+
+        goals[item["Away Team Name"]] += item["Away Team Goals"];
+        appearances[item["Away Team Name"]] ++;
+    });
+
+    // Goals should now contain the total number of goals for each team
+    console.log(goals);
+    console.log(appearances);
+
+    let maxAvgGoals = 0;
+    let maxTeam = "";
+
+    for(let i in goals)
+    {
+        goals[i] /= appearances[i];
+        // divide each entry in goals by the corresponding number of appearances to yield an average
+
+        if(goals[i] > maxAvgGoals)
+        {
+            // quick and dirty check for maximum value in the object
+            // there's probably a simpler way, but since we're looping through `goals` anyway...
+            maxAvgGoals = goals[i];
+            maxTeam = i;
+        }
+    }
+
+    return [maxTeam, maxAvgGoals];
 };
 
-getGoals();
-
+const max = getGoals(getFinals(fifaData));
+console.log(`${max[0]} has the highest number of goals per World Cup final (${max[1]}).`);
+// this shows only the first result (Uruguay, 4.0), not others with the same value (England)
 
 /* Stretch 4: Write a function called badDefense() that accepts a parameter `data` and calculates the team with the most goals scored against them per appearance (average goals against) in the World Cup finals */
 
-function badDefense(/* code here */) {
+function badDefense(data){
+    // this is pretty much the same function as above, except for the value extracted (goals against vs. goals for)
+    const goals = {}; // dictionaries-in-waiting
+    const appearances = {};
 
-    /* code here */
+    data.forEach(item => {
+        if(goals[item["Home Team Name"]] == undefined)
+        {
+            goals[item["Home Team Name"]] = 0; // add entries if there isn't one for this team yet
+            appearances[item["Home Team Name"]] = 0;
+        }
 
+        goals[item["Home Team Name"]] += item["Away Team Goals"]; // note swap for goals against
+        appearances[item["Home Team Name"]] ++;
+        
+        // repeat for away team
+        if(goals[item["Away Team Name"]] == undefined)
+        {
+            goals[item["Away Team Name"]] = 0;
+            appearances[item["Away Team Name"]] = 0;
+        }
+
+        goals[item["Away Team Name"]] += item["Home Team Goals"]; // ditto
+        appearances[item["Away Team Name"]] ++;
+    });
+
+    console.log(goals);
+    console.log(appearances);
+
+    let maxAvgGoals = 0;
+    let maxTeam = "";
+
+    for(let i in goals)
+    {
+        goals[i] /= appearances[i];
+
+        if(goals[i] > maxAvgGoals)
+        {
+            maxAvgGoals = goals[i];
+            maxTeam = i;
+        }
+    }
+
+    return [maxTeam, maxAvgGoals];
 };
 
-badDefense();
+const maxBad = badDefense(getFinals(fifaData));
+console.log(`${maxBad[0]} has the highest number of goals scored against them per World Cup final (${maxBad[1]}).`);
 
 /* If you still have time, use the space below to work on any stretch goals of your chosing as listed in the README file. */
